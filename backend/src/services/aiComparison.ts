@@ -47,7 +47,7 @@ async function callGroqAPI(prompt: string): Promise<string | null> {
         model: 'llama-3.3-70b-versatile',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
-        max_tokens: 2048,
+        max_tokens: 4096,
       }),
     });
 
@@ -122,62 +122,41 @@ function buildComparisonPrompt(
 
   const userContext = additionalContext || 'general developer';
 
-  return `Compare ${opt1} vs ${opt2}.
-Scalability: ${constraints.scalabilityPriority}
-User Background: "${userContext}"
+  return `Compare ${opt1} vs ${opt2} for a ${userContext}.
+Priority: Scalability=${constraints.scalabilityPriority}
 
 ${optionDetails}
 
-Return this EXACT JSON structure. Each pro/con MUST be 15-25 words (2-3 lines of text):
+Return ONLY this JSON with DETAILED explanations:
 
 {
-  "summary": "2-3 sentences comparing both options clearly",
-  "recommendation": "Pick [option] because [detailed reason in 2 sentences]",
-  "decisionGuidance": "Write 5-7 detailed sentences explaining: 1) When to choose the first option and why, 2) When to choose the second option and why, 3) Key trade-offs to consider, 4) What factors should influence the decision, 5) Any important caveats or considerations. Make this comprehensive and helpful for decision-making.",
+  "summary": "2-3 sentences comparing both options, highlighting key differences and trade-offs",
+  "recommendation": "${opt1} or ${opt2} with a detailed explanation of why (2-3 sentences)",
+  "decisionGuidance": "Detailed guidance on when to pick each option (3-4 sentences covering different scenarios)",
   "personalizedInsights": [
-    "Detailed tip 1 for ${userContext} - explain why this matters (15-20 words)",
-    "Detailed tip 2 with specific actionable advice (15-20 words)",
-    "Detailed tip 3 about learning path or next steps (15-20 words)",
-    "Detailed tip 4 about common mistakes to avoid (15-20 words)"
+    "Detailed insight 1 with specific advice (1-2 sentences)",
+    "Detailed insight 2 with actionable recommendation (1-2 sentences)",
+    "Detailed insight 3 with context-specific tip (1-2 sentences)"
   ],
   "detailedAnalysis": [
     {
       "optionName": "${opt1}",
-      "pros": [
-        "First strength explained in detail - what it means and why it matters for your project (15-25 words)",
-        "Second strength with practical benefits and real-world impact on development (15-25 words)",
-        "Third strength describing a specific advantage with examples (15-25 words)"
-      ],
-      "cons": [
-        "First weakness explained clearly - what challenges you might face and how to handle them (15-25 words)",
-        "Second weakness with context about when this becomes a problem (15-25 words)"
-      ],
-      "bestFor": "Detailed description of ideal use cases and project types (20-30 words)"
+      "pros": ["Detailed pro 1 explaining the benefit (1-2 sentences)", "Detailed pro 2 (1-2 sentences)", "Detailed pro 3 (1-2 sentences)"],
+      "cons": ["Detailed con 1 explaining the drawback (1-2 sentences)", "Detailed con 2 (1-2 sentences)"],
+      "bestFor": "Detailed description of ideal use cases and scenarios (2-3 sentences)"
     },
     {
       "optionName": "${opt2}",
-      "pros": [
-        "First strength explained in detail - what it means and why it matters for your project (15-25 words)",
-        "Second strength with practical benefits and real-world impact on development (15-25 words)",
-        "Third strength describing a specific advantage with examples (15-25 words)"
-      ],
-      "cons": [
-        "First weakness explained clearly - what challenges you might face and how to handle them (15-25 words)",
-        "Second weakness with context about when this becomes a problem (15-25 words)"
-      ],
-      "bestFor": "Detailed description of ideal use cases and project types (20-30 words)"
+      "pros": ["Detailed pro 1 explaining the benefit (1-2 sentences)", "Detailed pro 2 (1-2 sentences)", "Detailed pro 3 (1-2 sentences)"],
+      "cons": ["Detailed con 1 explaining the drawback (1-2 sentences)", "Detailed con 2 (1-2 sentences)"],
+      "bestFor": "Detailed description of ideal use cases and scenarios (2-3 sentences)"
     }
   ],
-  "pivotStatement": "Choose ${opt1} if [specific condition], otherwise choose ${opt2} if [specific condition]",
+  "pivotStatement": "Clear decision statement: ${opt1} for [specific scenarios], ${opt2} for [other scenarios] (1-2 sentences)",
   "confidenceScore": 85
 }
 
-CRITICAL RULES:
-1. Each pro/con MUST be 15-25 words (2-3 lines), NOT just 1-2 words
-2. personalizedInsights MUST have 4 detailed tips (15-20 words each)
-3. decisionGuidance MUST be 5-7 sentences with comprehensive analysis
-4. Use simple language a beginner can understand
-5. Return ONLY valid JSON`;
+RULES: Provide DETAILED, INFORMATIVE responses. Each point should be thorough and helpful. Return ONLY valid JSON.`;
 }
 
 /**
